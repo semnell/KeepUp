@@ -1,18 +1,27 @@
 .PHONY: up
 
-up:
-	docker-compose -f ./docker/docker-compose.yaml up -d
+faktory-up:
+	docker-compose up faktory -d
 	echo "Waiting for FAKTORY to start..."
 	sleep 5
 
-down: 
-	docker-compose -f ./docker/docker-compose.yaml down
+faktory-down:
+	docker-compose stop faktory
 
-run: up
+run: faktory-up
 	go run main.go
 
-run-server-standalone: up
+run-server-standalone: faktory-up
 	go run main.go server
 
-run-worker-standalone: up
+run-worker-standalone: faktory-up
 	go run main.go worker
+
+docker-build:
+	docker build . -f docker/Dockerfile --target dev
+
+up: 
+	docker-compose up -d
+
+down: 
+	docker-compose down

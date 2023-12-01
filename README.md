@@ -16,7 +16,9 @@ If you like KeepUp, please consider starring it.
 - Rich logging
 
 ## Basic usage
-edit the provided config.yaml to reflect your stack, afterwards start the project uing the Makefile and check the /metrics endpoint (defaults to http://127.0.0.1/metrics)
+- Copy the .env.example to .env
+- run either run or run-server-standalone + run-worker-standalone
+- Check metrics at 127.0.0.1:8080 and the Faktory server at 127.0.0.1:7420
 
 ## License
 This tool is licensed under the MIT-license. Do whatever you like with it. Go monitor the world. Or don't.

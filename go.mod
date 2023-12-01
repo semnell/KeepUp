@@ -45,6 +45,7 @@ require (
 	github.com/contribsys/faktory_worker_go v1.6.1
 	github.com/gin-contrib/zap v0.2.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/joho/godotenv v1.5.1
 	github.com/zsais/go-gin-prometheus v0.1.0
 	go.uber.org/zap v1.26.0
 	gopkg.in/yaml.v2 v2.4.0

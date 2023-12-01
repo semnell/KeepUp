@@ -2,6 +2,8 @@ package server
 
 import (
 	"io"
+	"os"
+	"strings"
 	"time"
 
 	"encoding/json"
@@ -24,7 +26,7 @@ func Serve(confPath string) {
 	server.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	server.Use(ginzap.RecoveryWithZap(logger, true))
 	utils.RegisterWorkers(conf)
-	server.Run()
+	server.Run(":" + os.Getenv("SERVER_PORT"))
 }
 
 func RegisterRoutes(s *gin.Engine) (err error) {
@@ -67,11 +69,14 @@ func upMarkerHandler() gin.HandlerFunc {
 			logger.Error(err.Error())
 		}
 		// set prometheus metric
+		// content.URL contains scheme, remove it
+		content.URL = strings.Split(content.URL, "://")[1]
 		if content.MarkUp {
 			site_up_gauge.WithLabelValues(content.URL, "200").Set(1)
 		} else {
 			site_up_gauge.WithLabelValues(content.URL, "200").Set(0)
 		}
+		site_response_time_gauge.WithLabelValues(content.URL).Set(content.ResponseTime)
 
 	}
 }
@@ -95,7 +100,7 @@ var site_response_time_gauge = prometheus.NewGaugeVec(
 	prometheus.GaugeOpts{
 		Namespace: "keepup",
 		Subsystem: "response_time",
-		Name:      "site_response_time",
+		Name:      "site_response_time_in_ms",
 		Help:      "a gauge of the response time of the site in the most recent check",
 	},
 	[]string{

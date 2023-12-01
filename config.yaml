@@ -1,7 +1,7 @@
 version: v1 # Version of the config
 jobs:
   - name: mainSite # Name of the job
-    type: https # Type of the job
+    scheme: https # Type of the job
     url: bitfactory.nl # URL of the job
     interval: 15 # Interval of the job
     timeout: 5 # Timeout of the job
@@ -11,4 +11,3 @@ jobs:
     method: GET # Method of the job
     expect: # Expect of the job
       status: 200
-      body: '{"key": "value"}'

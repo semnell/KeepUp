@@ -7,7 +7,7 @@ type Config struct {
 
 type Job struct {
 	Name     string `yaml:"name"`
-	Type     string `yaml:"type"`
+	Scheme   string `yaml:"scheme"`
 	URL      string `yaml:"url"`
 	Interval int    `yaml:"interval"`
 	Timeout  int    `yaml:"timeout"`
@@ -23,8 +23,9 @@ type Job struct {
 }
 
 type UpdateMetricPost struct {
-	URL     string `json:"url"`
-	Reason  string `json:"reason"`
-	ResCode int    `json:"resCode"`
-	MarkUp  bool   `json:"markUp"`
+	URL          string  `json:"url"`
+	Reason       string  `json:"reason"`
+	ResCode      int     `json:"resCode"`
+	MarkUp       bool    `json:"markUp"`
+	ResponseTime float64 `json:"responseTime"`
 }

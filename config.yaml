@@ -1,9 +1,9 @@
 version: v1 # Version of the config
 jobs:
-  - name: job1 # Name of the job
-    type: http # Type of the job
+  - name: mainSite # Name of the job
+    type: https # Type of the job
     url: bitfactory.nl # URL of the job
-    interval: 5 # Interval of the job
+    interval: 15 # Interval of the job
     timeout: 5 # Timeout of the job
     headers: # Headers of the job
       - key: Content-Type

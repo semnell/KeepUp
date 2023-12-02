@@ -18,7 +18,7 @@ If you like KeepUp, please consider starring it.
 ## Basic usage
 - Copy the .env.example to .env
 - run either `make run` or make `run-server-standalone` + `make run-worker-standalone`
-- Check metrics at 127.0.0.1:8080 and the Faktory server at 127.0.0.1:7420
+- Check metrics at 127.0.0.1:8080/metrics and the Faktory server at 127.0.0.1:7420
 
 ## License
 This tool is licensed under the MIT-license. Do whatever you like with it. Go monitor the world. Or don't.

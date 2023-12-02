@@ -93,7 +93,6 @@ func checkUrl(job utils.Job) (err error) {
 		panic(error)
 	}
 	defer response.Body.Close()
-	logger.Info(updateObj)
-	logger.Info("Ran job succesfully")
+	logger.Info("Ran successfully for " + job.URL)
 	return nil
 }

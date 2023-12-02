@@ -13,6 +13,7 @@ COPY --from=builder /go/bin/keepup /keepup/keepup
 COPY .env config.yaml /keepup/
 # Run the hello binary.
 ENV GIN_MODE=release
+ENV FAKTORY_PROVIDER=KEEPUP_FAKTORY_URL
 ENTRYPOINT ["/keepup/keepup"]
 
 FROM gcr.io/distroless/static
@@ -20,4 +21,5 @@ FROM gcr.io/distroless/static
 WORKDIR /keepup
 COPY --from=builder /go/bin/keepup /keepup/keepup
 ENV GIN_MODE=release
+ENV FAKTORY_PROVIDER=KEEPUP_FAKTORY_URL
 ENTRYPOINT ["/keepup/keepup"]

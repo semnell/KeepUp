@@ -20,6 +20,9 @@ var logger = utils.SetupSugaredLogger()
 func Work() {
 	mgr := faktoryWork.NewManager()
 	mgr.Register("checkUrl", HandleJob)
+	if os.Getenv("WORKER_CONCURRENCY") == "" {
+		os.Setenv("WORKER_CONCURRENCY", "1")
+	}
 	concurrency, err := strconv.Atoi(os.Getenv("WORKER_CONCURRENCY"))
 	if err != nil {
 		panic(err)

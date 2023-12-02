@@ -72,10 +72,10 @@ func RegisterWorkers(conf Config) {
 
 func postJob(interval int, obj string) {
 	client, err := faktory.Open()
-	if err != nil {
-		panic(err)
-	}
 	logger := SetupLogger()
+	if err != nil {
+		logger.Error(err.Error())
+	}
 	logger.Info(fmt.Sprintf("Posting job every %d seconds", interval))
 	for range time.Tick(time.Second * time.Duration(interval)) {
 		job := faktory.NewJob("checkUrl", obj)

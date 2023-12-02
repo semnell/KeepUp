@@ -25,3 +25,11 @@ up:
 
 down: 
 	docker-compose down
+
+generate-coverage:
+	rm coverage/unit/cov*
+	rm coverage/profile
+	go test -cover ./... -args -test.gocoverdir="${PWD}/coverage/unit"
+	go tool covdata percent -i=./coverage/unit
+	go tool covdata textfmt -i=./coverage/unit -o coverage/profile
+	go tool cover -func coverage/profile

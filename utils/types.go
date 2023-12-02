@@ -6,20 +6,24 @@ type Config struct {
 }
 
 type Job struct {
-	Name     string `yaml:"name"`
-	Scheme   string `yaml:"scheme"`
-	URL      string `yaml:"url"`
-	Interval int    `yaml:"interval"`
-	Timeout  int    `yaml:"timeout"`
-	Headers  []struct {
-		Key   string `yaml:"key"`
-		Value string `yaml:"value"`
-	} `yaml:"headers"`
-	Method string `yaml:"method"`
-	Expect struct {
-		Status int    `yaml:"status"`
-		Body   string `yaml:"body"`
-	} `yaml:"expect"`
+	Name     string       `yaml:"name"`
+	Scheme   string       `yaml:"scheme"`
+	URL      string       `yaml:"url"`
+	Interval int          `yaml:"interval"`
+	Timeout  int          `yaml:"timeout"`
+	Headers  []JobHeaders `yaml:"headers"`
+	Method   string       `yaml:"method"`
+	Expect   JobExpect    `yaml:"expect"`
+}
+
+type JobHeaders struct {
+	Key   string `yaml:"key"`
+	Value string `yaml:"value"`
+}
+
+type JobExpect struct {
+	Status int    `yaml:"status"`
+	Body   string `yaml:"body"`
 }
 
 type UpdateMetricPost struct {

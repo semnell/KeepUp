@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,jetbrains+all,git,macos,linux,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=go,visualstudiocode,jetbrains+all,git,macos,linux,windows
 .env
+
+/coverage/unit/cov*
+/coverage/profile
 ### Git ###
 # Created by git for backups. To disable backups in Git:
 # $ git config --global mergetool.keepBackup false

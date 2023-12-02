@@ -14,3 +14,10 @@ COPY .env config.yaml /keepup/
 # Run the hello binary.
 ENV GIN_MODE=release
 ENTRYPOINT ["/keepup/keepup"]
+
+FROM gcr.io/distroless/static
+# Copy our static executable.
+WORKDIR /keepup
+COPY --from=builder /go/bin/keepup /keepup/keepup
+ENV GIN_MODE=release
+ENTRYPOINT ["/keepup/keepup"]

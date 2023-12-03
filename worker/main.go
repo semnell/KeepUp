@@ -55,34 +55,19 @@ func checkUrl(job utils.Job) (err error) {
 		job.Method = "HEAD"
 	}
 	start := time.Now()
-	client := http.Client{
-		Timeout: 120 * time.Second,
+	res, err = doRequest(job, res, err)
+	if err != nil {
+		logger.Error(err.Error())
 	}
-
-	if job.Timeout != 0 {
-		client.Timeout = time.Duration(job.Timeout) * time.Second
-	}
-	var reg *http.Request
-	if job.Method == "HEAD" || job.Method == "GET" || job.Method == "OPTIONS" {
-		reg, _ = http.NewRequest(job.Method, job.URL, nil)
-		logger.Info("Request sent to " + job.URL)
-	} else {
-		logger.Error(job.Method + " is not a supporter Method right now.")
-	}
-	// cast job.Headers to utils.JobHeaders
-	if job.Headers != nil {
-		for _, header := range job.Headers {
-			reg.Header.Add(header.Key, header.Value)
-		}
-	}
-	reg.Header.Add("User-Agent", "KeepUp-monitoring-agent")
-
-	res, _ = client.Do(reg)
-
 	elapsed := time.Since(start)
 	if err != nil {
 		panic(err)
 	}
+	callback(job, res, elapsed)
+	return nil
+}
+
+func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 	var updateObj = utils.UpdateMetricPost{}
 	updateObj.ResCode = res.StatusCode
 	updateObj.URL = job.URL
@@ -100,16 +85,29 @@ func checkUrl(job utils.Job) (err error) {
 		}
 	}
 	b, err := json.Marshal(updateObj)
-	request, error := http.NewRequest("POST", os.Getenv("SERVER_CALLBACK_URL"), bytes.NewBuffer(b))
-	postclient := &http.Client{}
-	if error != nil {
-		panic(error)
+	if err != nil {
+		panic(err)
 	}
-	response, error := postclient.Do(request)
-	if error != nil {
-		panic(error)
+	request, er := http.NewRequest("POST", os.Getenv("SERVER_CALLBACK_URL"), bytes.NewBuffer(b))
+	postclient := &http.Client{}
+	if er != nil {
+		panic(er)
+	}
+	response, er := postclient.Do(request)
+	if er != nil {
+		panic(er)
 	}
 	defer response.Body.Close()
 	logger.Info("Ran successfully for " + job.URL)
-	return nil
+}
+
+func doRequest(job utils.Job, res *http.Response, err error) (*http.Response, error) {
+	if job.Method == "HEAD" {
+		res, err = http.Head(job.URL)
+	} else if job.Method == "GET" {
+		res, err = http.Get(job.URL)
+	} else {
+		logger.Error(job.Method + " is not a supporter Method right now.")
+	}
+	return res, err
 }

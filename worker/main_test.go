@@ -24,7 +24,7 @@ func TestWork(t *testing.T) {
 
 	// Run the Work function
 	go Work()
-	time.Sleep(3)
+	time.Sleep(3000)
 	// Restore the standard output
 	w.Close()
 	out, _ := io.ReadAll(r)
@@ -43,7 +43,7 @@ func TestCheckUrl(t *testing.T) {
 		// Add other fields as needed
 		Expect: utils.JobExpect{
 			Status: http.StatusOK,
-			// Add other expectation fields as needed
+			Body:   "testBody",
 		},
 	}
 

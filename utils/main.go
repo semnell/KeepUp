@@ -1,3 +1,4 @@
+// Package utils contains helper functions and structs
 package utils
 
 import (
@@ -12,6 +13,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// SetupLogger sets up a zap logger with default settings
 func SetupLogger() (logger *zap.Logger) {
 	l, err := zap.NewProduction()
 	if err != nil {
@@ -21,6 +23,7 @@ func SetupLogger() (logger *zap.Logger) {
 	return l
 }
 
+// SetupSugaredLogger sets up a zap sugared logger with default settings
 func SetupSugaredLogger() (sugaredLogger *zap.SugaredLogger) {
 	l, err := zap.NewProduction()
 	if err != nil {
@@ -31,6 +34,7 @@ func SetupSugaredLogger() (sugaredLogger *zap.SugaredLogger) {
 	return sugar
 }
 
+// LoadConfig loads a yaml config file into a Config struct
 func LoadConfig(path string) (conf Config) {
 	logger := SetupLogger()
 	logger.Info("Loading config")
@@ -51,6 +55,7 @@ func LoadConfig(path string) (conf Config) {
 	return conf
 }
 
+// RegisterWorkers registers all jobs in the config file as workers
 func RegisterWorkers(conf Config) {
 	logger := SetupLogger()
 	logger.Info("Registering workers")
@@ -60,16 +65,17 @@ func RegisterWorkers(conf Config) {
 			job.Interval = 60
 		}
 		// convert job to json
-		jobJson, err := json.Marshal(job)
+		jobJSON, err := json.Marshal(job)
 		if err != nil {
 			panic(err)
 		}
 
-		go postJob(job.Interval, string(jobJson))
+		go postJob(job.Interval, string(jobJSON))
 	}
 	logger.Info("Workers registered")
 }
 
+// postJob posts a job to the faktory queue every interval seconds
 func postJob(interval int, obj string) {
 	client, err := faktory.Open()
 	logger := SetupLogger()

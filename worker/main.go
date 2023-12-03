@@ -1,3 +1,4 @@
+// Package worker This file contains the worker code that is responsible for handeling all jobs
 package worker
 
 import (
@@ -17,9 +18,10 @@ var logger = utils.SetupSugaredLogger()
 
 // var res *http.Response
 
+// Work starts the main worker routine
 func Work() {
 	mgr := faktoryWork.NewManager()
-	mgr.Register("checkUrl", HandleJob)
+	mgr.Register("checkURL", HandleJob)
 	if os.Getenv("WORKER_CONCURRENCY") == "" {
 		os.Setenv("WORKER_CONCURRENCY", "1")
 	}
@@ -31,7 +33,7 @@ func Work() {
 	mgr.ProcessStrictPriorityQueues(os.Getenv("JOB_QUEUE_NAME"))
 	mgr.Run()
 }
-
+// HandleJob is the function that handles the job
 func HandleJob(ctx context.Context, args ...interface{}) error {
 	help := faktoryWork.HelperFor(ctx)
 	logger.Infof("Received job: %s", help.Jid())
@@ -41,11 +43,11 @@ func HandleJob(ctx context.Context, args ...interface{}) error {
 		logger.Errorf("Error unmarshalling json: %v", err)
 	}
 	logger.Debug("running job: " + obj.Name)
-	checkUrl(obj)
+	checkURL(obj)
 	return nil
 }
 
-func checkUrl(job utils.Job) (err error) {
+func checkURL(job utils.Job) (err error) {
 	if job.Scheme == "" {
 		job.Scheme = "https"
 	}

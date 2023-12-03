@@ -1,3 +1,4 @@
+// Package server Handles all server-side logic
 package server
 
 import (
@@ -18,32 +19,33 @@ import (
 var server = gin.Default()
 var logger = utils.SetupLogger()
 
+// Serve starts the server
 func Serve(confPath string) {
 	// load config into utils.Config struct
 	conf := utils.LoadConfig(confPath)
-	RegisterRoutes(server)
-	InitPrometheusMetrics(conf)
+	registerRoutes(server)
+	initPrometheusMetrics(conf)
 	server.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	server.Use(ginzap.RecoveryWithZap(logger, true))
 	utils.RegisterWorkers(conf)
 	server.Run(":" + os.Getenv("SERVER_PORT"))
 }
 
-func RegisterRoutes(s *gin.Engine) (err error) {
+func registerRoutes(s *gin.Engine) (err error) {
 	logger.Info("Registering routes")
 	s.GET("/metrics", prometheusHandler())
 	s.POST("/callback", upMarkerHandler())
 	return nil
 }
 
-func InitPrometheusMetrics(conf utils.Config) (err error) {
+func initPrometheusMetrics(conf utils.Config) (err error) {
 	logger.Info("Registering prometheus metrics")
 	for _, job := range conf.Jobs {
-		site_up_gauge.WithLabelValues(job.URL, "200").Set(0)
-		site_response_time_gauge.WithLabelValues(job.URL).Set(0)
+		siteUpGauge.WithLabelValues(job.URL, "200").Set(0)
+		siteResponseTimeGauge.WithLabelValues(job.URL).Set(0)
 		logger.Info("Registered prometheus metric: " + job.Name)
 	}
-	prometheus.MustRegister(site_up_gauge, site_response_time_gauge)
+	prometheus.MustRegister(siteUpGauge, siteResponseTimeGauge)
 	return nil
 }
 
@@ -72,16 +74,16 @@ func upMarkerHandler() gin.HandlerFunc {
 		// content.URL contains scheme, remove it
 		content.URL = strings.Split(content.URL, "://")[1]
 		if content.MarkUp {
-			site_up_gauge.WithLabelValues(content.URL, "200").Set(1)
+			siteUpGauge.WithLabelValues(content.URL, "200").Set(1)
 		} else {
-			site_up_gauge.WithLabelValues(content.URL, "200").Set(0)
+			siteUpGauge.WithLabelValues(content.URL, "200").Set(0)
 		}
-		site_response_time_gauge.WithLabelValues(content.URL).Set(content.ResponseTime)
+		siteResponseTimeGauge.WithLabelValues(content.URL).Set(content.ResponseTime)
 
 	}
 }
 
-var site_up_gauge = prometheus.NewGaugeVec(
+var siteUpGauge = prometheus.NewGaugeVec(
 	prometheus.GaugeOpts{
 		Namespace: "keepup",
 		Subsystem: "uptime",
@@ -96,7 +98,7 @@ var site_up_gauge = prometheus.NewGaugeVec(
 	},
 )
 
-var site_response_time_gauge = prometheus.NewGaugeVec(
+var siteResponseTimeGauge = prometheus.NewGaugeVec(
 	prometheus.GaugeOpts{
 		Namespace: "keepup",
 		Subsystem: "response_time",

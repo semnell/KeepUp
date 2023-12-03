@@ -1,3 +1,4 @@
+// Description: Entrypoint for the application. Starts the server and worker
 package main
 
 import (
@@ -20,21 +21,21 @@ func main() {
 	} else {
 		godotenv.Load()
 	}
-	var conf_path string = os.Getenv("CONFIG_FILE_PATH")
-	if _, err := os.Stat(conf_path); os.IsNotExist(err) {
+	var confPath = os.Getenv("CONFIG_FILE_PATH")
+	if _, err := os.Stat(confPath); os.IsNotExist(err) {
 		fmt.Println("Config path not found defaulting to in-dir config.")
 		path, err := os.Getwd()
 		if err != nil {
 			log.Println(err)
 		}
-		conf_path = path + "/config.yaml"
+		confPath = path + "/config.yaml"
 
 	}
 	fmt.Println(os.Args)
 	if len(os.Args) == 1 {
 		fmt.Println("Running server and worker")
 		go worker.Work()
-		server.Serve(conf_path)
+		server.Serve(confPath)
 	}
 
 	if len(os.Args) == 2 {
@@ -43,7 +44,7 @@ func main() {
 			worker.Work()
 			fmt.Println("Worker done")
 		} else if os.Args[1] == "server" {
-			server.Serve(conf_path)
+			server.Serve(confPath)
 		}
 	}
 }

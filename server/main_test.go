@@ -16,7 +16,7 @@ import (
 
 func TestRegisterRoutes(t *testing.T) {
 	router := gin.New()
-	err := RegisterRoutes(router)
+	err := registerRoutes(router)
 	require.NoError(t, err)
 
 	// Perform a GET request to /metrics
@@ -42,7 +42,7 @@ func TestInitPrometheusMetrics(t *testing.T) {
 	conf := utils.LoadConfig(tempFile.Name())
 
 	// Initialize Prometheus metrics
-	err := InitPrometheusMetrics(conf)
+	err := initPrometheusMetrics(conf)
 	assert.NoError(t, err)
 }
 

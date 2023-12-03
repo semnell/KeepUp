@@ -58,6 +58,6 @@ func TestCheckUrl(t *testing.T) {
 	os.Setenv("SERVER_CALLBACK_URL", server.URL)
 
 	// Call the checkUrl function
-	err := checkUrl(job)
+	err := checkURL(job)
 	assert.NoError(t, err)
 }

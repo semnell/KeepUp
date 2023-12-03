@@ -88,14 +88,14 @@ func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 	if err != nil {
 		panic(err)
 	}
-	request, er := http.NewRequest("POST", os.Getenv("SERVER_CALLBACK_URL"), bytes.NewBuffer(b))
-	postclient := &http.Client{}
-	if er != nil {
-		panic(er)
+	request, localError := http.NewRequest("POST", os.Getenv("SERVER_CALLBACK_URL"), bytes.NewBuffer(b))
+	client := &http.Client{}
+	if localError != nil {
+		panic(localError)
 	}
-	response, er := postclient.Do(request)
-	if er != nil {
-		panic(er)
+	response, localError := client.Do(request)
+	if localError != nil {
+		panic(localError)
 	}
 	defer response.Body.Close()
 	logger.Info("Ran successfully for " + job.URL)

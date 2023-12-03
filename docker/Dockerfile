@@ -8,7 +8,7 @@ COPY . .
 RUN go build -o /go/bin/keepup
 
 # Dev stage
-FROM alpine:latest as dev
+FROM alpine:3.18.5 as dev
 WORKDIR /keepup
 COPY --from=builder /go/bin/keepup /keepup/keepup
 COPY .env config.yaml /keepup/
@@ -16,7 +16,7 @@ ENV FAKTORY_PROVIDER=KEEPUP_FAKTORY_URL
 ENTRYPOINT ["/keepup/keepup"]
 
 # Production stage
-FROM gcr.io/distroless/static as prod
+FROM gcr.io/distroless/static:nonroot as prod
 WORKDIR /keepup
 COPY --from=builder /go/bin/keepup /keepup/keepup
 ENV GIN_MODE=release

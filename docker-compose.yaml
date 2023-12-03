@@ -1,29 +1,29 @@
-version: '3'
+version: '3.8'
 
-name: keep-up
 services:
-    faktory:
-        stdin_open: true
-        tty: true
-        ports:
-            - 127.0.0.1:7419:7419
-            - 127.0.0.1:7420:7420
-        image: contribsys/faktory:latest
-        command: /faktory -b :7419 -w :7420
-        networks:
-            - keepup
-    keepup:
-        stdin_open: true
-        tty: true
-        depends_on:
-            - faktory
-        networks:
-            - keepup
-        build: 
-            context: .
-            dockerfile: docker/Dockerfile
-            target: dev
+  faktory:
+    image: contribsys/faktory:latest
+    ports:
+      - "7419:7419"
+      - "7420:7420"
+    stdin_open: true
+    tty: true
+    command: /faktory -b :7419 -w :7420
+    networks:
+      - keepup
+
+  keepup:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: dev
+    depends_on:
+      - faktory
+    stdin_open: true
+    tty: true
+    networks:
+      - keepup
 
 networks:
-    keepup:
-        name: keepup
+  keepup:
+    name: keepup

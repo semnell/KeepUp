@@ -23,6 +23,10 @@ func TestRegisterRoutes(t *testing.T) {
 	req, err := http.NewRequest("GET", "/metrics", nil)
 	require.NoError(t, err)
 
+	verifyMetricsEndpoint(t, router, req)
+}
+
+func verifyMetricsEndpoint(t *testing.T, router *gin.Engine, req *http.Request) {
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 

@@ -1,4 +1,0 @@
-- Helm charts
-- Usefull example
-- Better Makefile
-- Better docker-compose file

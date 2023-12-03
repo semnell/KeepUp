@@ -2,6 +2,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/semnell/KeepUp)](https://goreportcard.com/report/github.com/semnell/KeepUp)
 [![Tests](https://github.com/semnell/KeepUp/actions/workflows/go-test.yml/badge.svg)](https://github.com/semnell/KeepUp/actions/workflows/go-test.yml)
 [![Docker Builds](https://github.com/semnell/KeepUp/actions/workflows/docker-image.yml/badge.svg)](https://github.com/semnell/KeepUp/actions/workflows/docker-image.yml)
+[![codebeat badge](https://codebeat.co/badges/2d1784dc-7b42-4c49-9082-7d96a034b2e2)](https://codebeat.co/projects/github-com-semnell-keepup-main)
 
 KeepUp is a robust and simple-to-use uptime monitoring tool designed to be both lightweight and scalable, with the capability to distribute tasks across multiple workers for efficient handling of requests. Whether you're monitoring a few endpoints or hundreds, KeepUp aims to provide a straightforward and performant solution.
 

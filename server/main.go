@@ -41,7 +41,7 @@ func InitPrometheusMetrics(conf utils.Config) (err error) {
 	for _, job := range conf.Jobs {
 		site_up_gauge.WithLabelValues(job.URL, "200").Set(0)
 		site_response_time_gauge.WithLabelValues(job.URL).Set(0)
-		logger.Info("Registerd prometheus metric: " + job.Name)
+		logger.Info("Registered prometheus metric: " + job.Name)
 	}
 	prometheus.MustRegister(site_up_gauge, site_response_time_gauge)
 	return nil

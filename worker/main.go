@@ -64,7 +64,7 @@ func checkUrl(job utils.Job) (err error) {
 	}
 	elapsed := time.Since(start)
 	if res == nil {
-		logger.Error("No Respone object found")
+		logger.Error("No Response object found")
 	}
 	if err != nil {
 		panic(err)

@@ -55,17 +55,31 @@ func checkUrl(job utils.Job) (err error) {
 		job.Method = "HEAD"
 	}
 	start := time.Now()
-	if job.Method == "HEAD" {
-		res, err = http.Head(job.URL)
-	} else if job.Method == "GET" {
-		res, err = http.Get(job.URL)
+	client := http.Client{
+		Timeout: 120 * time.Second,
+	}
+
+	if job.Timeout != 0 {
+		client.Timeout = time.Duration(job.Timeout) * time.Second
+	}
+	var reg *http.Request
+	if job.Method == "HEAD" || job.Method == "GET" || job.Method == "OPTIONS" {
+		reg, _ = http.NewRequest(job.Method, job.URL, nil)
+		logger.Info("Request sent to " + job.URL)
 	} else {
 		logger.Error(job.Method + " is not a supporter Method right now.")
 	}
-	elapsed := time.Since(start)
-	if res == nil {
-		logger.Error("No Response object found")
+	// cast job.Headers to utils.JobHeaders
+	if job.Headers != nil {
+		for _, header := range job.Headers {
+			reg.Header.Add(header.Key, header.Value)
+		}
 	}
+	reg.Header.Add("User-Agent", "KeepUp-monitoring-agent")
+
+	res, _ = client.Do(reg)
+
+	elapsed := time.Since(start)
 	if err != nil {
 		panic(err)
 	}
@@ -87,11 +101,11 @@ func checkUrl(job utils.Job) (err error) {
 	}
 	b, err := json.Marshal(updateObj)
 	request, error := http.NewRequest("POST", os.Getenv("SERVER_CALLBACK_URL"), bytes.NewBuffer(b))
-	client := &http.Client{}
+	postclient := &http.Client{}
 	if error != nil {
 		panic(error)
 	}
-	response, error := client.Do(request)
+	response, error := postclient.Do(request)
 	if error != nil {
 		panic(error)
 	}

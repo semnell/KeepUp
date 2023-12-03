@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "keepup.name" . }}
+  labels:
+    app: {{ include "keepup.name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "keepup.name" . }}
+      release: "{{ .Release.Name }}"
+  template:
+    metadata:
+      labels:
+        app: {{ include "keepup.name" . }}
+        release: "{{ .Release.Name }}"
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: FAKTORY_PROVIDER
+              valueFrom:
+                secretKeyRef:
+                  name: faktory-secret
+                  key: faktory-url
+          ports:
+            - containerPort: {{ .Values.service.internalPort }}
+              name: http
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "keepup.fullname" . }}
+  labels:
+    app: {{ include "keepup.name" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.externalPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "keepup.name" . }}
+    release: "{{ .Release.Name }}"

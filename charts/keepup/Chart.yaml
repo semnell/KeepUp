@@ -1,0 +1,5 @@
+apiVersion: v2
+name: keepup
+description: A helm chart for the simple keepup uptime monitor
+version: 0.1.0
+appVersion: 1.0.0

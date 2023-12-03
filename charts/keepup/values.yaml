@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: keepup
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  internalPort: 8080
+  externalPort: 80
+
+keepup:
+  name: keepup

@@ -1,23 +1,22 @@
+# Builder stage
 FROM golang:alpine AS builder
 RUN apk update && apk add --no-cache git
 WORKDIR $GOPATH/src/keepup/build/
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
-RUN go get -d -v
 RUN go build -o /go/bin/keepup
 
-
-FROM gcr.io/distroless/static as dev
-# Copy our static executable.
+# Dev stage
+FROM alpine:latest as dev
 WORKDIR /keepup
 COPY --from=builder /go/bin/keepup /keepup/keepup
 COPY .env config.yaml /keepup/
-# Run the hello binary.
-ENV GIN_MODE=release
 ENV FAKTORY_PROVIDER=KEEPUP_FAKTORY_URL
 ENTRYPOINT ["/keepup/keepup"]
 
-FROM gcr.io/distroless/static
-# Copy our static executable.
+# Production stage
+FROM gcr.io/distroless/static as prod
 WORKDIR /keepup
 COPY --from=builder /go/bin/keepup /keepup/keepup
 ENV GIN_MODE=release

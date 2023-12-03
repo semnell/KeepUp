@@ -45,6 +45,10 @@ faktory-up: ## Start Faktory Docker container
 faktory-down: ## Stop Faktory Docker container
 	docker-compose stop faktory
 
+.PHONY: revive
+revive: ## Run revive linter
+	revive -exclude vendor/... ./...
+
 .PHONY: run
 run: faktory-up ## Run the application
 	$(GO) run main.go
@@ -61,13 +65,16 @@ run-worker-standalone: faktory-up ## Run the worker standalone
 docker-build: ## Build Docker image
 	docker build . -f docker/Dockerfile --target dev
 
+.PHONY: coverage
+coverage: generate-coverage ## Run tests with coverage
+
 .PHONY: generate-coverage
 generate-coverage: ## Generate code coverage
-	rm -rf coverage/unit
 	go test -cover ./... -args -test.gocoverdir="${PWD}/coverage/unit"
 	go tool covdata percent -i=./coverage/unit
 	go tool covdata textfmt -i=./coverage/unit -o coverage/profile
 	go tool cover -func coverage/profile
+	rm coverage/unit/cov*
 
 .PHONY: help
 help: ## Display this help message

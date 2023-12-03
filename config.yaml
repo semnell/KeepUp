@@ -5,7 +5,7 @@ jobs:
     url: bitfactory.nl # URL of the job
     interval: 15 # Interval of the job
     timeout: 1 # Timeout of the job 
-    headers: # Headers of the job -> not implemented currently
+    headers: # Headers of the job
       - key: Content-Type
         value: application/json
     method: GET # Method of the job

@@ -4,10 +4,11 @@ jobs:
     scheme: https # Type of the job
     url: bitfactory.nl # URL of the job
     interval: 15 # Interval of the job
-    timeout: 5 # Timeout of the job -> not implemented currently
+    timeout: 1 # Timeout of the job 
     headers: # Headers of the job -> not implemented currently
       - key: Content-Type
         value: application/json
     method: GET # Method of the job
     expect: # Expect of the job
       status: 200
+      # body: "Hello World"

@@ -34,6 +34,7 @@ func Work() {
 	mgr.ProcessStrictPriorityQueues(os.Getenv("JOB_QUEUE_NAME"))
 	mgr.Run()
 }
+
 // HandleJob is the function that handles the job
 func HandleJob(ctx context.Context, args ...interface{}) error {
 	help := faktoryWork.HelperFor(ctx)

@@ -26,6 +26,7 @@ type JobHeaders struct {
 type JobExpect struct {
 	Status int    `yaml:"status"`
 	Body   string `yaml:"body"`
+	Contains []string `yaml:"contains"`
 }
 // UpdateMetricPost is the struct for the callback
 type UpdateMetricPost struct {

@@ -65,7 +65,7 @@ func checkURL(job utils.Job) (err error) {
 	}
 	elapsed := time.Since(start)
 	if err != nil {
-		panic(err)
+		logger.Error(err.Error())
 	}
 	callback(job, res, elapsed)
 	return nil

@@ -5,6 +5,7 @@ type Config struct {
 	Version string `yaml:"version"`
 	Jobs    []Job  `yaml:"jobs"`
 }
+
 // Job is the struct for a job in the config file
 type Job struct {
 	Name     string       `yaml:"name"`
@@ -22,12 +23,14 @@ type JobHeaders struct {
 	Key   string `yaml:"key"`
 	Value string `yaml:"value"`
 }
+
 // JobExpect is the struct for the expect in a job
 type JobExpect struct {
-	Status int    `yaml:"status"`
-	Body   string `yaml:"body"`
+	Status   int      `yaml:"status"`
+	Body     string   `yaml:"body"`
 	Contains []string `yaml:"contains"`
 }
+
 // UpdateMetricPost is the struct for the callback
 type UpdateMetricPost struct {
 	URL          string  `json:"url"`

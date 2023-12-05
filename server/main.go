@@ -3,6 +3,7 @@ package server
 
 import (
 	"io"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -35,6 +36,7 @@ func registerRoutes(s *gin.Engine) (err error) {
 	logger.Info("Registering routes")
 	s.GET("/metrics", prometheusHandler())
 	s.POST("/callback", upMarkerHandler())
+	s.GET("/status", statusHandler())
 	return nil
 }
 
@@ -54,6 +56,15 @@ func prometheusHandler() gin.HandlerFunc {
 	h := promhttp.Handler()
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+func statusHandler() gin.HandlerFunc {
+	logger.Info("Registering status handler")
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": "ok",
+		})
 	}
 }
 

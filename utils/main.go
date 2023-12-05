@@ -84,7 +84,8 @@ func postJob(interval int, obj string) {
 	}
 	logger.Info(fmt.Sprintf("Posting job every %d seconds", interval))
 	for range time.Tick(time.Second * time.Duration(interval)) {
-		job := faktory.NewJob("checkUrl", obj)
+		logger.Info("posting job")
+		job := faktory.NewJob("checkURL", obj)
 		job.Queue = os.Getenv("JOB_QUEUE_NAME")
 		err = client.Push(job)
 		if err != nil {

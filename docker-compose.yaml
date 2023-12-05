@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   faktory:
@@ -10,7 +10,7 @@ services:
     tty: true
     command: /faktory -b :7419 -w :7420
     security_opt:
-      - no-new-privileges: true
+      - no-new-privileges:true
     networks:
       - keepup
 
@@ -24,11 +24,11 @@ services:
     stdin_open: true
     tty: true
     security_opt:
-      - read_only: true
-      - no-new-privileges: true
+      - read_only:true
+      - no-new-privileges:true
     networks:
       - keepup
 
-networks:  
+networks:
   keepup:
     name: keepup

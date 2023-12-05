@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	faktoryWork "github.com/contribsys/faktory_worker_go"
@@ -33,6 +34,7 @@ func Work() {
 	mgr.ProcessStrictPriorityQueues(os.Getenv("JOB_QUEUE_NAME"))
 	mgr.Run()
 }
+
 // HandleJob is the function that handles the job
 func HandleJob(ctx context.Context, args ...interface{}) error {
 	help := faktoryWork.HelperFor(ctx)
@@ -85,6 +87,18 @@ func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 		if job.Expect.Body != respString {
 			updateObj.MarkUp = false
 		}
+	}
+	if job.Expect.Contains != nil {
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(res.Body)
+		respBytes := buf.String()
+		respString := string(respBytes)
+		for _, s := range job.Expect.Contains {
+			if !strings.Contains(respString, s) {
+				updateObj.MarkUp = false
+			}
+		}
+
 	}
 	b, err := json.Marshal(updateObj)
 	if err != nil {

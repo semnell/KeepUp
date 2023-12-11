@@ -61,7 +61,8 @@ func checkURL(job utils.Job) (err error) {
 	start := time.Now()
 	res, err = doRequest(job, res, err)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Warn(err.Error())
+		callback(job, res, time.Since(start))
 	}
 	elapsed := time.Since(start)
 	if err != nil {
@@ -73,13 +74,20 @@ func checkURL(job utils.Job) (err error) {
 
 func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 	var updateObj = utils.UpdateMetricPost{}
-	updateObj.ResCode = res.StatusCode
+	updateObj.MarkUp = false // default to false
+	// test if res contains anything
+	if res != nil {
+		updateObj.ResCode = res.StatusCode
+	} else {
+		updateObj.ResCode = 0
+		logger.Error("setting rescode to 0 to reflect connection error, check logs/url")
+	}
 	updateObj.URL = job.URL
-	if updateObj.ResCode == job.Expect.Status {
+	if updateObj.ResCode == job.Expect.Status && res != nil  {
 		updateObj.MarkUp = true
 	}
 	updateObj.ResponseTime = float64(elapsed.Milliseconds())
-	if job.Expect.Body != "" {
+	if job.Expect.Body != "" && res != nil{
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(res.Body)
 		respBytes := buf.String()
@@ -88,7 +96,7 @@ func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 			updateObj.MarkUp = false
 		}
 	}
-	if job.Expect.Contains != nil {
+	if job.Expect.Contains != nil && res != nil{
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(res.Body)
 		respBytes := buf.String()

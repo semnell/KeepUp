@@ -3,8 +3,8 @@ jobs:
   - name: self # Name of the job
     scheme: http # Type of the job
     url: 127.0.0.1:8080/status # URL of the job
-    interval: 2 # Interval of the job
-    timeout: 1 # Timeout of the job
+    interval: 1 # Interval of the job
+    timeout: 5 # Timeout of the job
     headers: # Headers of the job
       - key: Content-Type
         value: application/json

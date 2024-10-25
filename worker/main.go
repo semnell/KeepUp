@@ -139,7 +139,7 @@ func doRequest(job utils.Job, res *http.Response) (*http.Response, error) {
 	} else if job.Method == "GET" {
 		res, err = http.Get(job.URL)
 	} else {
-		err = logger.Errorf("%s is not a supported method right now.", job.Method)
+		logger.Error("%s is not a supported method right now.", job.Method)
 	}
 	return res, err
 }

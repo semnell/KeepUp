@@ -1,10 +1,13 @@
 package worker
 
 import (
+	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -104,7 +107,7 @@ func TestDoRequest(t *testing.T) {
 	job.URL = server.URL
 
 	// Call the doRequest function
-	res, err := doRequest(job, nil, nil)
+	res, err := doRequest(job, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }

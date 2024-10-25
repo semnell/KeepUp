@@ -1,4 +1,3 @@
-// Package worker This file contains the worker code that is responsible for handeling all jobs
 package worker
 
 import (
@@ -17,8 +16,6 @@ import (
 
 var logger = utils.SetupSugaredLogger()
 
-// var res *http.Response
-
 // Work starts the main worker routine
 func Work() {
 	mgr := faktoryWork.NewManager()
@@ -28,7 +25,8 @@ func Work() {
 	}
 	concurrency, err := strconv.Atoi(os.Getenv("WORKER_CONCURRENCY"))
 	if err != nil {
-		panic(err)
+		logger.Errorf("Error converting WORKER_CONCURRENCY to int: %v", err)
+		return
 	}
 	mgr.Concurrency = concurrency
 	mgr.ProcessStrictPriorityQueues(os.Getenv("JOB_QUEUE_NAME"))
@@ -43,13 +41,19 @@ func HandleJob(ctx context.Context, args ...interface{}) error {
 	err := json.Unmarshal([]byte(args[0].(string)), &obj)
 	if err != nil {
 		logger.Errorf("Error unmarshalling json: %v", err)
+		return err
 	}
 	logger.Debug("running job: " + obj.Name)
-	checkURL(obj)
+	err = checkURL(obj)
+	if err != nil {
+		logger.Errorf("Error checking URL: %v", err)
+		return err
+	}
 	return nil
 }
 
-func checkURL(job utils.Job) (err error) {
+// checkURL checks the status of a URL and sends a callback with the result
+func checkURL(job utils.Job) error {
 	if job.Scheme == "" {
 		job.Scheme = "https"
 	}
@@ -59,19 +63,18 @@ func checkURL(job utils.Job) (err error) {
 		job.Method = "HEAD"
 	}
 	start := time.Now()
-	res, err = doRequest(job, res, err)
+	res, err := doRequest(job, res)
 	if err != nil {
-		logger.Warn(err.Error())
+		logger.Warnf("Request error: %v", err)
 		callback(job, res, time.Since(start))
+		return err
 	}
 	elapsed := time.Since(start)
-	if err != nil {
-		logger.Error(err.Error())
-	}
 	callback(job, res, elapsed)
 	return nil
 }
 
+// callback sends a callback with the result of the URL check
 func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 	var updateObj = utils.UpdateMetricPost{}
 	updateObj.MarkUp = false // default to false
@@ -83,11 +86,11 @@ func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 		logger.Error("setting rescode to 0 to reflect connection error, check logs/url")
 	}
 	updateObj.URL = job.URL
-	if updateObj.ResCode == job.Expect.Status && res != nil  {
+	if updateObj.ResCode == job.Expect.Status && res != nil {
 		updateObj.MarkUp = true
 	}
 	updateObj.ResponseTime = float64(elapsed.Milliseconds())
-	if job.Expect.Body != "" && res != nil{
+	if job.Expect.Body != "" && res != nil {
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(res.Body)
 		respBytes := buf.String()
@@ -96,7 +99,7 @@ func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 			updateObj.MarkUp = false
 		}
 	}
-	if job.Expect.Contains != nil && res != nil{
+	if job.Expect.Contains != nil && res != nil {
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(res.Body)
 		respBytes := buf.String()
@@ -110,28 +113,33 @@ func callback(job utils.Job, res *http.Response, elapsed time.Duration) {
 	}
 	b, err := json.Marshal(updateObj)
 	if err != nil {
-		panic(err)
+		logger.Errorf("Error marshalling updateObj: %v", err)
+		return
 	}
 	request, localError := http.NewRequest("POST", os.Getenv("SERVER_CALLBACK_URL"), bytes.NewBuffer(b))
-	client := &http.Client{}
 	if localError != nil {
-		panic(localError)
+		logger.Errorf("Error creating new request: %v", localError)
+		return
 	}
+	client := &http.Client{}
 	response, localError := client.Do(request)
 	if localError != nil {
-		panic(localError)
+		logger.Errorf("Error sending request: %v", localError)
+		return
 	}
 	defer response.Body.Close()
-	logger.Info("Ran successfully for " + job.URL)
+	logger.Infof("Ran successfully for %s", job.URL)
 }
 
-func doRequest(job utils.Job, res *http.Response, err error) (*http.Response, error) {
+// doRequest performs the HTTP request for the given job
+func doRequest(job utils.Job, res *http.Response) (*http.Response, error) {
+	var err error
 	if job.Method == "HEAD" {
 		res, err = http.Head(job.URL)
 	} else if job.Method == "GET" {
 		res, err = http.Get(job.URL)
 	} else {
-		logger.Error(job.Method + " is not a supporter Method right now.")
+		err = logger.Errorf("%s is not a supported method right now.", job.Method)
 	}
 	return res, err
 }

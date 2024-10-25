@@ -61,3 +61,132 @@ We certainly hope so. Your feedback and contributions are always welcome to make
 - Run the binary with the correct `.env` values and the `worker` argument.
 
 In most setups, it's recommended to run the server on a single machine and distribute workers across multiple machines. Note that running the server multiple times is not allowed due to unique Prometheus metrics and the server's exclusive ability to add new jobs to the queue.
+
+## Setup Instructions
+
+1. **Clone the Repository:**
+   ```sh
+   git clone https://github.com/semnell/KeepUp.git
+   cd KeepUp
+   ```
+
+2. **Install Dependencies:**
+   ```sh
+   go mod download
+   ```
+
+3. **Build the Application:**
+   ```sh
+   make build
+   ```
+
+4. **Run the Application:**
+   ```sh
+   make run
+   ```
+
+## Configuration Options and Environment Variables
+
+The application can be configured using a `config.yaml` file and environment variables. Below are the available options:
+
+### `config.yaml`
+
+```yaml
+version: v1 # Version of the config
+jobs:
+  - name: self # Name of the job
+    scheme: http # Type of the job
+    url: 127.0.0.1:8080/status # URL of the job
+    interval: 1 # Interval of the job
+    timeout: 5 # Timeout of the job
+    headers: # Headers of the job
+      - key: Content-Type
+        value: application/json
+    method: GET # Method of the job
+    expect: # Expect of the job
+      status: 200
+      contains:
+        - "ok"
+```
+
+### Environment Variables
+
+| Variable               | Description                          | Default Value               |
+|------------------------|--------------------------------------|-----------------------------|
+| `FAKTORY_URL`          | URL of the Faktory server            | `http://yourFaktoryAdress:7419` |
+| `CONFIG_FILE_PATH`     | Path to the configuration file       | `./config.yaml`             |
+| `SERVER_PORT`          | Port for the server to listen on     | `8080`                      |
+| `WORKER_CONCURRENCY`   | Number of concurrent workers         | `20`                        |
+| `JOB_QUEUE_NAME`       | Name of the job queue                | `keepup`                    |
+| `SERVER_CALLBACK_URL`  | Callback URL for the server          | `http://127.0.0.1:8080/callback` |
+| `GIN_MODE`             | Mode for the Gin framework           | `release`                   |
+
+## Testing and Running the Application
+
+### Running Tests
+
+To run the tests, use the following command:
+
+```sh
+make test
+```
+
+### Running the Application
+
+To run the application, use the following command:
+
+```sh
+make run
+```
+
+You can also run the server and worker separately:
+
+#### Running the Server
+
+```sh
+make run-server-standalone
+```
+
+#### Running the Worker
+
+```sh
+make run-worker-standalone
+```
+
+## Contribution Guidelines
+
+We welcome contributions to improve KeepUp. To contribute, please follow these guidelines:
+
+1. **Fork the Repository:**
+   - Click the "Fork" button at the top right of the repository page.
+
+2. **Clone Your Fork:**
+   ```sh
+   git clone https://github.com/your-username/KeepUp.git
+   cd KeepUp
+   ```
+
+3. **Create a New Branch:**
+   ```sh
+   git checkout -b feature/your-feature-name
+   ```
+
+4. **Make Your Changes:**
+   - Ensure your code follows the project's coding style and conventions.
+   - Add tests for your changes if applicable.
+
+5. **Commit Your Changes:**
+   ```sh
+   git commit -m "Add your commit message here"
+   ```
+
+6. **Push Your Changes:**
+   ```sh
+   git push origin feature/your-feature-name
+   ```
+
+7. **Create a Pull Request:**
+   - Go to the repository page on GitHub and click the "New Pull Request" button.
+   - Provide a clear description of your changes and any related issues.
+
+Thank you for contributing to KeepUp!

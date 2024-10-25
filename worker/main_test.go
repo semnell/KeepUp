@@ -61,3 +61,83 @@ func TestCheckUrl(t *testing.T) {
 	err := checkURL(job)
 	assert.NoError(t, err)
 }
+
+func TestHandleJob(t *testing.T) {
+	// Create a sample job object
+	job := utils.Job{
+		Name:   "testJob",
+		URL:    "example.com",
+		Scheme: "https",
+		Method: "GET",
+		Expect: utils.JobExpect{
+			Status: http.StatusOK,
+			Body:   "testBody",
+		},
+	}
+
+	// Convert job object to JSON string
+	jobJSON, err := json.Marshal(job)
+	assert.NoError(t, err)
+
+	// Call the HandleJob function
+	err = HandleJob(context.Background(), string(jobJSON))
+	assert.NoError(t, err)
+}
+
+func TestDoRequest(t *testing.T) {
+	// Create a sample job object
+	job := utils.Job{
+		Name:   "testJob",
+		URL:    "example.com",
+		Scheme: "https",
+		Method: "GET",
+	}
+
+	// Create a mock HTTP server
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		// Add mock response body if needed
+	}))
+	defer server.Close()
+
+	// Set the mock server URL in the job object
+	job.URL = server.URL
+
+	// Call the doRequest function
+	res, err := doRequest(job, nil, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestCallback(t *testing.T) {
+	// Create a sample job object
+	job := utils.Job{
+		Name:   "testJob",
+		URL:    "example.com",
+		Scheme: "https",
+		Method: "GET",
+		Expect: utils.JobExpect{
+			Status: http.StatusOK,
+			Body:   "testBody",
+		},
+	}
+
+	// Create a mock HTTP server
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		// Add mock response body if needed
+	}))
+	defer server.Close()
+
+	// Set the mock server URL in the environment variable
+	os.Setenv("SERVER_CALLBACK_URL", server.URL)
+
+	// Create a sample response object
+	res := &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(strings.NewReader("testBody")),
+	}
+
+	// Call the callback function
+	callback(job, res, time.Millisecond*100)
+}

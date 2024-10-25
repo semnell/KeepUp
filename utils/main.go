@@ -1,4 +1,3 @@
-// Package utils contains helper functions and structs
 package utils
 
 import (
@@ -42,13 +41,12 @@ func LoadConfig(path string) (conf Config) {
 	// load yaml file into conf struct
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
+		logger.Error("Error reading config file: ", err)
 		panic(err)
-	}
-	if err != nil {
-		log.Fatal(err)
 	}
 	err = yaml.Unmarshal(yamlFile, &conf)
 	if err != nil {
+		logger.Error("Error unmarshalling config file: ", err)
 		panic(err)
 	}
 	logger.Info("Config loaded")
@@ -67,6 +65,7 @@ func RegisterWorkers(conf Config) {
 		// convert job to json
 		jobJSON, err := json.Marshal(job)
 		if err != nil {
+			logger.Error("Error marshalling job to JSON: ", err)
 			panic(err)
 		}
 
@@ -80,7 +79,7 @@ func postJob(interval int, obj string) {
 	client, err := faktory.Open()
 	logger := SetupLogger()
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Error("Error opening Faktory client: ", err)
 	}
 	logger.Info(fmt.Sprintf("Posting job every %d seconds", interval))
 	for range time.Tick(time.Second * time.Duration(interval)) {
@@ -89,6 +88,7 @@ func postJob(interval int, obj string) {
 		job.Queue = os.Getenv("JOB_QUEUE_NAME")
 		err = client.Push(job)
 		if err != nil {
+			logger.Error("Error pushing job to Faktory: ", err)
 			panic(err)
 		}
 	}

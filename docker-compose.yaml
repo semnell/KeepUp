@@ -28,6 +28,13 @@ services:
       - no-new-privileges:true
     networks:
       - keepup
+    environment:
+      - FAKTORY_PROVIDER=KEEPUP_FAKTORY_URL
+      - GIN_MODE=release
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
 
 networks:
   keepup:

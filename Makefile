@@ -76,6 +76,11 @@ generate-coverage: ## Generate code coverage
 	go tool cover -func coverage/profile
 	rm coverage/unit/cov*
 
+.PHONY: fmt-revive
+fmt-revive: ## Run gofmt and revive for consistent code formatting and style
+	$(GOFMT) $(GOFMT_FLAGS) -w .
+	revive -exclude vendor/... ./...
+
 .PHONY: help
 help: ## Display this help message
 	@echo "Usage: make [target]"
